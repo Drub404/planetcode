@@ -1,0 +1,669 @@
+on skript load:
+   login to "NTU1NDIzODIzNTEyNDY5NTA0.D3Qj0Q.k1LIQivLcRq1LDlE4VbhO_GfAuc" with name "Planet Code"
+   set status of "Planet Code" to do not disturb
+   mark "Planet Code" as listening ".help"
+
+discord command .reward [<member>] [<integer>]:
+	trigger:
+		delete event-message
+		if event-member has role named "Competition Manager":
+			if arg-1 is set:
+				if arg-2 is set:
+					add arg-2 to {points::%arg-1%}
+					reply with "Successfully rewarded %arg-1% with %arg-2% points!"
+				else:
+					reply with "You need to specify an amount!"
+			else:
+				reply with "You need to specify a member!"
+		else:
+			reply with "Nope, no access."
+
+discord command .answer [<text>]:
+	trigger:
+		delete event-message
+		if arg-1 is not set:
+			make embed:
+				set color of embed to white
+				set title of the embed to "You can't answer nothing!"
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+		else:
+			if {competition::state} is true:
+				make embed:
+					set color of embed to white
+					set the author info of the embed to author named "New answer from %name of event-member%!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+					add field named "" with value "%arg-1%" to embed
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					send {_embed} to event-member with event-bot
+					send {_embed} to channel with id "560177988776362005" with event-bot
+			else:
+				make embed:
+					set color of embed to white
+					set title of the embed to "There's no competition going on at the moment."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+
+discord command .competition [<text>]:
+	trigger:
+		delete event-message
+		if event-member has role named "Competition Manager":
+			if arg-1 is "start":
+				set {competition::state} to true
+				reply with "Successfully enabled the answers feature!"
+			else if arg-1 is "end":
+				set {competition::state} to false
+				reply with "Successfully disabled the answers feature!"
+			else:
+				reply with "You need to add ``start`` to start a competition, or ``end`` to end a competition."
+		else:
+			reply with "Nope, no access."
+
+discord command .eval [<text>]:
+	trigger:
+		delete event-message
+		if event-member has role named "Founder":
+			if arg-1 is not set:
+				reply with "You don't want me anything to test? Meh.. alright."
+			else:
+				set {_msg} to arg-1
+				evaluate {_msg}
+				stop
+		else:
+			reply with "You don't have permission to do this!"
+
+discord command .faq:
+	trigger:
+		make embed:
+			set color of embed to white
+			set the author info of the embed to author named "F.A.Q - Planet Code" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+			set title of the embed to ":question: Do you need help? Sure!"
+			set the description of embed to "If you require any further assistance, please contact our staff members!"
+			set the thumbnail of embed to "https://cdn.discordapp.com/attachments/557321332627603478/561252792962908180/faq-35d2746257a0de47159da2bc1468b451.png"
+			add field named ":one: What do I do with points?" with value "Points can be used for shopping, gambling and flexing on people.%nl%Execute .help economy for more information." to embed
+			add field named ":two: How can I become staff?" with value "You can't apply or DM the owner for staff. %nl%The owner himself decides who is fit for staff." to embed
+			add field named ":three: I need help with something, what do I do?" with value "You can head over to the support channels. %nl%Ask your question in there, and if it's%nl% an emergency you can tag the language. (E.g @ Pyton)" to embed
+			add field named ":four: What can I do in this server?" with value "You're able to chat, post memes, listen to music, participate %nl%at our competitions, play with the bot and ask for help." to embed
+			add field named ":five: How long has this server been around?" with value "Planet: Code has been around since the 1st of March!" to embed
+			add field named ":six: Who made that dank bot called 'Planet Code'?" with value "Drub did, he owns me. And I'm also a private bot %nl% which means you can't use me for your server." to embed
+			set {_embed} to the last made embed
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			reply with {_embed}
+
+discord command .help [<text>]:
+	trigger:
+		if arg-1 is not set:
+			if event-member has role named "Moderator":
+				make embed:
+					set color of embed to white
+					set title of the embed to "Help is on the way!"
+					add field named "Economy Help :money_with_wings:" with value "``.help economy``" to embed
+					add field named "General Help :dizzy:" with value "``.help general``" to embed
+					add field named "Moderation Help :desktop:" with value "``.help moderation``" to embed
+					set {_embed} to the last made embed
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					reply with {_embed}
+			else:
+				make embed:
+					set color of embed to white
+					set title of the embed to "Help is on the way!"
+					add field named " :money_with_wings: Economy Help" with value "``.help economy``" to embed
+					add field named ":dizzy: General Help" with value "``.help general``" to embed
+					add field named ":lock: Moderation Help" to embed
+					set {_embed} to the last made embed
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					reply with {_embed}
+		else if arg-1 is "economy":
+			make embed:
+				set color of embed to white
+				set title of the embed to "Economy Help"
+				add field named "Introduction to Planet Code's economy:" with value "To start things off with, our economy makes use of points. %nl% Points can be obtained through several ways." to embed
+				add field named "━━━━━━━━❖━━━━━━━━" to embed
+				add field named ":hammer_pick: Work" with value "The first method is by working. %nl% You can work every 2 hours. ``.work``" to embed
+				add field named ":gift: Daily package" with value "The second method is by claiming your daily package. %nl% This package can be claimed once every 24 hours and contains a lot of points! ``.daily``" to embed
+				add field named ":speech_balloon: Chatting" with value "The third method is simply by chatting. %nl% You have 50 percent chance of earning 1 point per message sent!" to embed
+				add field named ":tada: Drop Party" with value "And the final method is by participating at drop parties. %nl% These are most of the time announced by the owner and last for 15 seconds. ``.dropparty claim``" to embed
+				add field named ":shopping_cart: Shop" with value "The shop can be used for buying special perks, and upgrade stuff. While this is still being worked on you won't have access to the shop. ``.shop``" to embed
+				add field named ":game_die: Gambling" with value "Gambling could get you super rich in no-time or make you the brokest member in this discord. %nl% The percentages are: 35 percent winning chance & 65 percent losing chance. ``.gamble [amount]``" to embed
+				add field named ":money_with_wings: Pay" with value "Paying members can be useful sometimes. %nl% To pay someone points you can use ``.pay [member] [amount]``." to embed
+				set {_embed} to the last made embed
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				reply with {_embed}
+		else if arg-1 is "general":
+			make embed:
+				set color of embed to white
+				set title of the embed to "General Help"
+				add field named "Information about the general commands:" with value "There's nothing special about the general commands, %nl% however you might need some explanation about what each command does." to embed
+				add field named "━━━━━━━━❖━━━━━━━━" to embed
+				add field named ":gear: Help" with value "Get a list with all the commands! ``.help``" to embed
+				add field named ":information_source: Info" with value "Receive info about a specific user. ``.info [user]``" to embed
+				add field named ":frame_photo: Avatar" with value "Get the avatar link and image of yourself, or someone else! ``.avatar [user]``" to embed
+				add field named ":question: Frag" with value "What is 'fragging'? ``.frag``" to embed
+				add field named ":incoming_envelope: Messages" with value "See how many messages you've sent in general! (Counts only for messages sent in general!) ``.messages [<user>]``" to embed
+				add field named ":credit_card: Points" with value "See how many points you have or someone else has! ``.points [<user>]``" to embed
+				add field named ":money_with_wings: Pay" with value "Paying members can be useful sometimes. %nl% To pay someone points you can use ``.pay [member] [amount]``." to embed
+				add field named ":grey_question: Faq" with value "We understand that not every member knows everything. %nl% Therefore we have a Frequently Asked Questions feature. ``.faq``" to embed
+				add field named ":pencil: Answer" with value "Every now and then the competition managers organize a competition. %nl% To avoid cheating we allow you to send answers to the competition managers directly. ``.answer [text]``" to embed
+				set {_embed} to the last made embed
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				reply with {_embed}
+		else if arg-1 is "Moderation":
+			if event-member has role named "Moderator":
+				make embed:
+					set color of embed to white
+					set title of the embed to "Moderation Help"
+					add split field named "Moderation Commands:" with value "**Purge** %nl% ``.purge [integer]`` %nl% **More coming soon..**" to embed
+					set {_embed} to the last made embed
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					reply with {_embed}
+			else:
+				make embed:
+					set color of embed to white
+					set title of the embed to "Nope, no access to this help panel! Sorry."
+					set {_embed} to the last made embed
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					reply with {_embed}
+		else:
+			make embed:
+				set color of embed to white
+				set title of the embed to "There's no help panel with the name ``%arg-1%``!"
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+
+discord command .shop:
+	trigger:
+		make embed:
+			set color of embed to white
+			set the author info of the embed to author named "Welcome to my shop.." with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+			set title of the embed to "Here's some information for you to know:"
+			set the description of embed to "When you're looking to buy stuff, simply do: ``.buy <item>`` %nl% PPM = Points Per Message"
+			add split field named "Special Perks" with value ":white_small_square: **+1 PPM** (5000 points)%nl%:white_small_square: **+2 PPM** (7500 points)" to embed
+			add split field named "Roles" with value ":white_small_square: **Starter** (2500 points)%nl%:white_small_square: **Veteran** (5000 points)%nl%:white_small_square: **Special** (7500 points)%nl%:white_small_square: **Well-Known** (10.000 points)%nl%:white_small_square: **Elder** (15.000 points)" to embed
+			add split field named "Coming Soon.." with value "Coming Soon.." to embed
+			set the thumbnail of embed to "https://cdn.discordapp.com/attachments/557321332627603478/561233298215534600/Shop-icon.png"
+			set {_embed} to the last made embed
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			reply with {_embed}
+
+discord command .buy [<text>]:
+	trigger:
+		if arg-1 is not set:
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				set the description of embed to "It seems that you can't access this, or it doesn't exist."
+				set {_embed} to the last made embed
+				set the footer of embed to footer with text "Planet Code by Drub"
+				set the timestamp of embed to now
+				reply with {_embed}
+		else if arg-1 is "+1 PPM":
+			if {points::%event-member%} >= 5000:
+				if event-member has role named "+1 PPM":
+					reply with "You already have that feature unlocked!"
+				else:
+					add role with id "561238525136076823" to roles of event-member
+					make embed:
+						set color of embed to white
+						set the author info of the embed to author named "Successfully purchase!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+						set the description of embed to "Successfully purchased the ``+1 PPM`` feature! %nl% This will give you 2 points instead of 1 per message sent!"
+						set {_embed} to the last made embed
+						set the footer of embed to footer with text "Planet Code by Drub"
+						set the timestamp of embed to now
+						reply with {_embed}
+			else:
+				reply with "You don't have enough points to purchase this!"
+		else if arg-1 is "+2 PPM":
+			if {points::%event-member%} >= 7500:
+				if event-member has role named "+2 PPM":
+					reply with "You already have that feature unlocked!"
+				else if event-member doesn't have the role named "+1 PPM":
+					reply with "You first need to unlock the ``+1 PPM`` feature first!"
+				else:
+					add role with id "561238648650072083" to roles of event-member
+					make embed:
+						set color of embed to white
+						set the author info of the embed to author named "Successfully purchase!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+						set the description of embed to "Successfully purchased the ``+2 PPM`` feature! %nl% This will give you 3 points instead of 1 per message sent!"
+						set {_embed} to the last made embed
+						set the footer of embed to footer with text "Planet Code by Drub"
+						set the timestamp of embed to now
+						reply with {_embed}
+			else:
+				reply with "You don't have enough points to purchase this!"
+		else:
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				set title of the embed to "It seems that you can't access this, or it doesn't exist."
+				set {_embed} to the last made embed
+				set the footer of embed to footer with text "Planet Code by Drub"
+				set the timestamp of embed to now
+				reply with {_embed}
+
+discord command .info [<member>]:
+	trigger:
+		if arg-1 is not set:
+			send typing in event-channel
+			make embed:
+				set color of embed to white
+				set title of the embed to "Who is %name of event-member%?"
+				add field named "Name" with value "%name of event-member%" to embed
+				add field named "User ID" with value "%id of event-member%" to embed
+				add field named "Status" with value "%online status of event-member%" to embed
+				add field named "Mention tag" with value "%mention tag of event-member%" to embed
+				add field named "Joined Discord" with value "%discord join date of event-user%" to embed
+				if game of arg-1 is not set:
+					add field named "Game Playing" with value "N/A" to embed
+				else:
+					add field named "Game Playing" with value "%game of event-member%" to embed
+				if {messages::%event-member%} is not set:
+					add field named "Message Count" with value "0" to embed
+				else:
+					add field named "Message Count" with value "%{messages::%event-member%}%" to embed
+				if {points::%event-member%} is not set:
+					add field named "Points" with value "0" to embed
+				else:
+					add field named "Points" with value "%{points::%event-member%}%" to embed
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+		else:
+			send typing in event-channel
+			make embed:
+				set color of embed to white
+				set title of the embed to "Who is %name of arg-1%?"
+				add field named "Name" with value "%name of arg-1%" to embed
+				add field named "User ID" with value "%id of arg-1%" to embed
+				add field named "Status" with value "%online status of arg-1%" to embed
+				add field named "Mention tag" with value "%mention tag of arg-1%" to embed
+				add field named "Joined Discord" with value "%discord join date of arg-1%" to embed
+				if game of arg-1 is not set:
+					add field named "Game Playing" with value "N/A" to embed
+				else:
+					add field named "Game Playing" with value "%game of arg-1%" to embed
+				if {messages::%arg-1%} is not set:
+					add field named "Message Count" with value "0" to embed
+				else:
+					add field named "Message Count" with value "%{messages::%arg-1%}%" to embed
+				if {points::%arg-1%} is not set:
+					add field named "Points" with value "0" to embed
+				else:
+					add field named "Points" with value "%{points::%arg-1%}%" to embed
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+
+discord command .dropparty [<text>]:
+	trigger:
+		delete event-message
+		if arg-1 is "start":
+			if event-member has role named "Founder":
+				set {dropparty.state} to true
+				wait 1 seconds
+				reply with "The.."
+				wait 1 seconds
+				reply with "Drop.."
+				wait 1 seconds
+				reply with "Party.."
+				wait 1 seconds
+				reply with "Has.."
+				wait 1 seconds
+				reply with "Started!"
+				wait 2 seconds
+				reply with "Type ``.dropparty claim`` to pick up points! %nl% You have **__15 seconds__** to claim as many points as possible!"
+				wait 15 seconds
+				reply with "The dropparty has ended."
+				set {dropparty.state} to false
+			else:
+				reply with "You don't have permission to do this!"
+		else if arg-1 is "end":
+			if event-member has role named "Founder":
+				reply with "The dropparty has ended."
+				set {dropparty.state} to false
+			else:
+				reply with "You don't have permission to do this!"
+		else if arg-1 is "claim":
+			if {dropparty.state} is true:
+				set {_claim} to a random integer between 150 and 250
+				reply with "%mention tag of event-member% has picked up %{_claim}% points from the dropparty!"
+				add {_claim} to {points::%event-member%}
+			else:
+				reply with "There's currently no dropparty active."
+
+discord command .frag:
+	trigger:
+		make embed:
+			set color of embed to cyan
+			set title of the embed to "Fragmenting is intentionally shortening your messages so you can increase your count."
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			set {_embed} to the last made embed
+			set footer of {_embed} to a footer with text ""
+			reply with {_embed}
+
+discord command .pointsadmin [<text>] [<member>] [<integer>]:
+	aliases: pa
+	trigger:
+		if event-member has role named "Administrator":
+			if arg-1 is "add":
+				if arg-2 is set:
+					if arg-3 is set:
+						add arg-3 to {points::%arg-2%}
+						reply with "Added %arg-3% points to %arg-2%'s points!"
+					else:
+						reply with "Unknown command."
+				else:
+					reply with "Unknown command."
+			else if arg-1 is "remove":
+				if arg-2 is set:
+					if arg-3 is set:
+						subtract arg-3 from {points::%arg-2%}
+						reply with "Removed %arg-3% points from %arg-2%'s points!"
+					else:
+						reply with "Unknown command."
+				else:
+					reply with "Unknown command."
+			else if arg-1 is "set":
+				if arg-2 is set:
+					if arg-3 is set:
+						set {points::%arg-2%} to arg-3
+						reply with "Successfully set %arg-2%'s points to %arg-3%!"
+					else:
+						reply with "Unknown command."
+				else:
+					reply with "Unknown command."
+			else if arg-1 is "reset":
+				if arg-2 is set:
+					set {points::%arg-2%} to 0
+					reply with "Successfully reset %arg-2%'s points!"
+				else:
+					reply with "Unknown command."
+			else if arg-1 is "reset all":
+				set {points::*} to 0
+				reply with "Successfully reset everyone's points!"
+			else:
+				reply with "You either put: ``add``, ``remove``, ``set``, ``reset`` or ``reset all``!"
+
+discord command .work:
+	trigger:
+		set {_waited} to difference between {work.%event-member%.lastused} and now
+		if {_waited} is less than 2 hours:
+			reply with "You have to wait **%difference between 2 hours and {_waited}%** before you can work again!"
+			stop
+		else:
+			set {_work} to a random integer between 116 and 238
+			make embed:
+				set color of embed to white
+				set title of the embed to "You have worked for ``%{_work}%`` points."
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+			add {_work} to {points::%event-member%}
+			set {work.%event-member%.lastused} to now
+
+discord command .daily:
+	trigger:
+		set {_daily} to difference between {daily.%event-member%.lastused} and now
+		if {_daily} is less than 24 hours:
+			reply with "You have to wait %difference between 24 hours and {_daily}% before you can claim your daily package!"
+			stop
+		else:
+			set {_daily} to a random integer between 500 and 750
+			make embed:
+				set color of embed to white
+				set title of the embed to "You picked up %{_daily}% points from your daily package!"
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+			add {_daily} to {points::%event-member%}
+			set {daily.%event-member%.lastused} to now
+
+discord command .pay [<member>] [<integer>]:
+	trigger:
+		if arg-1 is not set:
+			reply with "You need to specify a member!"
+		else if arg-2 is not set:
+			reply with "You need to specify an amount to pay!"
+		else:
+			subtract arg-2 from {points::%event-member%}
+			add arg-2 to {points::%arg-1%}
+			reply with "Successfully paid ``%arg-2%`` points to %name of arg-1%"
+
+discord command .points [<member>]:
+	aliases: p
+	trigger:
+		if arg-1 is not set:
+			if {points::%event-member%} is not set:
+				make embed:
+					set color of embed to white
+					set title of the embed to "You have 0 points."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+			else:
+				make embed:
+					set color of embed to white
+					set title of the embed to "You have %{points::%event-member%}% points."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+		else:
+			if {points::%arg-1%} is not set:
+				make embed:
+					set color of embed to white
+					set title of the embed to "%arg-1% has 0 points."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+			else:
+				make embed:
+					set color of embed to white
+					set title of the embed to "%arg-1% has %{points::%arg-1%}% points."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+
+discord command .gamble [<integer>]:
+	trigger:
+		if arg-1 is not set:
+			reply with "You need to enter an amount to gamble with!"
+		else if {points::%event-member%} >= arg-1:
+			if arg-1 is 0:
+				reply with "You can't gamble nothing.. silly!"
+			else:
+				chance of 35%:
+					subtract arg-1 from {points::%event-member%}
+					add arg-1 to {points::%event-member%}
+					add arg-1 to {points::%event-member%}
+					reply with "You won! You now have %{points::%event-member%}% points."
+					stop
+				else:
+					subtract arg-1 from {points::%event-member%}
+					reply with "You lost. You now have %{points::%event-member%}% points."
+					stop
+				reply with "I don't want to gamble right now. Come back in ``1`` second!"
+		else:
+			reply with "You don't have that many points in your wallet!"
+
+discord command .purge [<number>]:
+	trigger:
+		delete event-message
+		if arg-1 is not set:
+			make embed:
+				set color of embed to white
+				set title of the embed to "You need to specify a number that I can purge!"
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to last made embed
+				reply with {_embed}
+		else:
+			if event-member has role named "Moderator":
+				send typing in event-channel
+				grab the last arg-1 messages in event-channel
+				purge the grabbed messages with event-bot
+				make embed:
+					set color of embed to white
+					set title of the embed to "I have successfully purged %arg-1% messages."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to last made embed
+					reply with {_embed} and store the message in {_answer}
+					wait 2 seconds
+					delete random message out of {_answer} with event-bot
+			else:
+				reply with "You need to have the Moderator role or higher to use this!"
+
+discord command .avatar [<member>]:
+	aliases: av
+	trigger:
+		if arg-1 is not set:
+			reply with "%avatar of event-member%"
+		else:
+			reply with "%avatar of arg-1%"
+
+discord command .messages [<member>]:
+	aliases: m
+	trigger:
+		if arg-1 is not set:
+			if {messages::%event-member%} is not set:
+				make embed:
+					set color of embed to white
+					set title of the embed to "You have sent 0 messages."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+			else:
+				make embed:
+					set color of embed to white
+					set title of the embed to "You have sent %{messages::%event-member%}% messages."
+					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+		else if {messages::%arg-1%} is not set:
+			make embed:
+				set color of embed to white
+				set title of the embed to "%arg-1% has sent 0 messages."
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+		else:
+			make embed:
+				set color of the embed to white
+				set title of the embed to "%arg-1% has sent %{messages::%arg-1%}% messages."
+				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				reply with {_embed}
+
+on guild message received seen by "Planet Code":
+	if event-member has role named "+1 PPM":
+		if event-channel is channel with id "551225024393117708":
+			add 1 to {messages::%event-member%}
+			chance of 50%:
+				add 2 to {points::%event-member%}
+			else:
+				stop
+	if event-member has role named "+2 PPM":
+		if event-channel is channel with id "551225024393117708":
+			add 1 to {messages::%event-member%}
+			chance of 50%:
+				add 3 to {points::%event-member%}
+			else:
+				stop
+	if {messages::%event-member%} = 100:
+		reply with "%mention tag of event-member%"
+		make embed:
+			set color of embed to white
+			set title of the embed to "%name of event-member% has just sent __100__ messages! %nl% And has been awarded with ``100`` points for that!"
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			set {_embed} to the last made embed
+			reply with {_embed}
+		add 100 to {points::%event-member%}
+	if {messages::%event-member%} = 200:
+		reply with "%mention tag of event-member%"
+		make embed:
+			set color of embed to white
+			set title of the embed to "%name of event-member% has just sent __200__ messages! %nl% And has been awarded with ``200`` points for that!"
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			set {_embed} to the last made embed
+			reply with {_embed}
+		add 200 to {points::%event-member%}
+	if {messages::%event-member%} = 300:
+		reply with "%mention tag of event-member%"
+		make embed:
+			set color of embed to white
+			set title of the embed to "%name of event-member% has just sent __300__ messages! %nl% And has been awarded with ``300`` points for that!"
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			set {_embed} to the last made embed
+			reply with {_embed}
+		add 300 to {points::%event-member%}
+	if {messages::%event-member%} = 400:
+		reply with "%mention tag of event-member%"
+		make embed:
+			set color of embed to white
+			set title of the embed to "%name of event-member% has just sent __400__ messages! %nl% And has been awarded with ``400`` points for that!"
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			set {_embed} to the last made embed
+			reply with {_embed}
+		add 400 to {points::%event-member%}
+	if {messages::%event-member%} = 500:
+		reply with "%mention tag of event-member%"
+		make embed:
+			set color of embed to white
+			set title of the embed to "%name of event-member% has just sent __500__ messages! %nl% And has been awarded with ``500`` points for that!"
+			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the timestamp of embed to now
+			set {_embed} to the last made embed
+			reply with {_embed}
+		add 500 to {points::%event-member%}
+	if event-channel is channel with id "551225024393117708":
+		add 1 to {messages::%event-member%}
+		chance of 50%:
+			add 1 to {points::%event-member%}
+		else:
+			stop
+
+on member join guild:
+#	send "Hello!" to channel with id "551225024393117708" with event-bot
+	send "%mention tag of event-member%" to channel with id "551225024393117708" with event-bot
+	make embed:
+		set color of embed to white
+		set title of the embed to "%event-member% joined the server."
+		set the author info of the embed to author named "Welcome to Planet: Code!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+		set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+		set the timestamp of embed to now
+		set {_embed} to the last made embed
+		send {_embed} to channel with id "551225024393117708" with event-bot
+
+on direct message received:
+	reply with "Please don't send me DM's for help. %nl% You can do ``.help`` in the Planet: Code discord for more information!"
