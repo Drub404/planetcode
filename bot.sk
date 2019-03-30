@@ -1,5 +1,5 @@
 on skript load:
-   login to "NTU1NDIzODIzNTEyNDY5NTA0.D3Qj0Q.k1LIQivLcRq1LDlE4VbhO_GfAuc" with name "Planet Code"
+   login to "TOKEN" with name "Planet Code"
    set status of "Planet Code" to do not disturb
    mark "Planet Code" as listening ".help"
 
