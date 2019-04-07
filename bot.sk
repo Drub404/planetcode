@@ -1,6 +1,3 @@
-options:
-	TOKEN: TOKEN_HERE
-
 on skript load:
    login to {@TOKEN} with name "Planet Code"
    set status of "Planet Code" to do not disturb
@@ -323,6 +320,7 @@ discord command .bug [<text>]:
 
 discord command .staff [<text>]:
 	trigger:
+		delete event-message
 		set {_staff} to difference between {staff.%event-member%.lastused} and now
 		if {_staff} is less than 1 seconds:
 			reply with "You can't request assistance from staff right now because you're on a cooldown for %difference between 1 seconds and {_staff}%!"
@@ -343,7 +341,7 @@ discord command .staff [<text>]:
 				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_needhelp} to the last made embed
-				#send "@here" to channel with id "561506865595285505" with event-bot
+				send "@here" to channel with id "561506865595285505" with event-bot
 				send {_needhelp} to channel with id "561506865595285505" with event-bot and store the message in {needhelpemoji}
 				add reactions "white_check_mark" to reactions of {needhelpemoji}
 			make embed:
