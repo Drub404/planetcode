@@ -1,7 +1,151 @@
+options:
+	default: ".help | Drub is nub"
+	guild: "Planet: Code"
+	bot: "Planet Code"
+	token: TOKEN_HERE
+
 on skript load:
-   login to {@TOKEN} with name "Planet Code"
-   set status of "Planet Code" to do not disturb
-   mark "Planet Code" as listening ".help"
+   login to "{@TOKEN}" with name "Planet Code"
+   set status of "Planet Code" to online
+   mark "Planet Code" as watching {@default}
+   set {in.use} to false
+
+discord command .totalmessages:
+	trigger:
+		reply with "This server has %{totalmessages.humans}% messages sent by humans!"
+
+discord command .setmark type [<text>] text [<text>]:
+	trigger:
+		if arg-1 is not set:
+			reply with "Correct Usage: `.setmark type [watching/playing/listening] text [text]`"
+		else if arg-2 is not set:
+			reply with "Correct Usage: `.setmark type [watching/playing/listening] text [text]`"
+		else if {in.use} is true:
+			reply with "The bot is still displaying something from someone else!"
+		else if {in.use} is false:
+			if arg-1 is "watching":
+				if {points::%event-member%} >= 500:
+					subtract 500 from {points::%event-member%}
+					mark "Planet Code" as watching arg-2
+					reply with "Successfully marked myself as ""Watching %arg-2%""!"
+					set {in.use} to true
+					wait 120 seconds
+					set {in.use} to false
+					mark "Planet Code" as watching {@default}
+					stop
+				else:
+					reply with "Not enough points!"
+			else if arg-1 is "playing":
+				if {points::%event-member%} >= 500:
+					subtract 500 from {points::%event-member%}
+					mark "Planet Code" as playing arg-2
+					reply with "Successfully marked myself as ""Playing %arg-2%""!"
+					set {in.use} to true
+					wait 120 seconds
+					set {in.use} to false
+					mark "Planet Code" as watching {@default}
+					stop
+				else:
+					reply with "Not enough points!"
+			else if arg-1 is "listening":
+				if {points::%event-member%} >= 500:
+					subtract 500 from {points::%event-member%}
+					mark "Planet Code" as listening to arg-2
+					reply with "Successfully marked myself as ""Listening to %arg-2%""!"
+					set {in.use} to true
+					wait 120 seconds
+					set {in.use} to false
+					mark "Planet Code" as watching {@default}
+					stop
+				else:
+					reply with "Not enough points!"
+			else:
+				make embed:
+					set color of embed to white
+					set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+					set the description of embed to "It seems that you can't access this, or it doesn't exist."
+					set {_error} to the last made embed
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					reply with {_error}
+		else:
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				set the description of embed to "It seems that you can't access this, or it doesn't exist."
+				set {_error} to the last made embed
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				reply with {_error}
+
+discord command .role name [<text>] color [<text>]:
+	trigger:
+		if arg-1 is not set:
+			reply with "``.role name [<text>] color [<text>]``"
+		else if arg-2 is not set:
+			reply with "``.role name [<text>] color [<text>]``"
+		else if {role::%event-member%} is true:
+			if {requested::%event-member%} is false:
+				reply with "Successfully notified Drub that you're willing to have your own role."
+				send "**__New role request!__** %nl%``Name of role:`` %arg-1% %nl%``Color of role:`` %arg-2%%nl%``Requested by:`` %mention tag of event-member%" to channel with id "564940999361822740" with event-bot
+				set {requested::%event-member%} to true
+			else:
+				reply with "You already requested a role!"
+		else:
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				set the description of embed to "It seems that you can't access this, or it doesn't exist."
+				set {_error} to the last made embed
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				reply with {_error}
+
+discord command .secret command:
+	trigger:
+		delete event-message
+		set {_easter} to difference between {easter.%event-member%.lastused} and now
+		if {_easter} is less than 12 hours:
+			reply with "You can't execute this command right now because you're on a cooldown for %difference between 12 hours and {_easter}%!"
+			stop
+		else:
+			add 1500 to {points::%event-member%}
+			set {easter.%event-member%.lastused} to now
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Sshhh" with url "https://discordapp.com/channels/551225024393117706/551227990155984905/555426109466869781" and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				set description of the embed to "Sshhh, keep this command a secret! Because you can get a lot of points from it. :wink:"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_easterdm} to the last made embed
+				send {_easterdm} to event-member with event-bot
+
+discord command .c t [<text>] d [<text>]:
+	trigger:
+		if arg-1 is not set:
+			reply with "``.c t [<text>] d [<text>]``"
+		else if arg-2 is not set:
+			reply with "``.c t [<text>] d [<text>]``"
+		else if event-member has role named "Founder":
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Changelog Update! - by %event-member%" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				add field named ":small_red_triangle_down: **Title:** :small_red_triangle_down:" with value "```%arg-1%```" to embed
+				add field named "**Description:**" with value "```%arg-2%```" to embed
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				set {_embed} to the last made embed
+				send {_embed} to channel with id "558370797920583710" with event-bot
+				reply with "I've successfully sent the changelog to the __##bots-changelog__ channel!"
+		else:
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				set the description of embed to "It seems that you can't access this, or it doesn't exist."
+				set {_error} to the last made embed
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the timestamp of embed to now
+				reply with {_error}
 
 discord command .pareset [<member>]:
 	trigger:
@@ -98,29 +242,6 @@ discord command .say [<text>]:
 			set {say.%event-member%.lastused} to now
 			stop
 
-discord command .status:
-	roles: Founder
-	trigger:
-		loop 9999999999999999999999999999 times:
-			mark "Planet Code" as playing "with your girl."
-			set status of "Planet Code" to do not disturb
-			wait 60 seconds
-			mark "Planet Code" as watching "funny vines."
-			set status of "Planet Code" to idle
-			wait 60 seconds
-			mark "Planet Code" as listening "Drub complaining."
-			set status of "Planet Code" to online
-			wait 60 seconds
-			mark "Planet Code" as playing "a random game."
-			set status of "Planet Code" to do not disturb
-			wait 60 seconds
-			mark "Planet Code" as watching "the stars."
-			set status of "Planet Code" to idle
-			wait 60 seconds
-			mark "Planet Code" as listening "the radio."
-			set status of "Planet Code" to online
-			wait 60 seconds
-
 discord command .reset [<member>]:
 	trigger:
 		set {feedback::%arg-1%} to false
@@ -133,7 +254,7 @@ discord command .feedback [<integer>]:
 				set color of embed to white
 				set the author info of the embed to author named "Please enter an integer between 0 and 10!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 				set the description of the embed to "``0`` = Very bad made bot, nothing works and everything is so ugly. %nl% ``10`` = Outstanding bot! Works flawlessly and found no bugs 'till now."
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_arg1} to the last made embed
 				reply with {_arg1}
@@ -141,7 +262,7 @@ discord command .feedback [<integer>]:
 			make embed:
 				set color of embed to white
 				set the author info of the embed to author named "You have already rated the bot!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_alreadyvoted} to the last made embed
 				reply with {_alreadyvoted}
@@ -149,7 +270,7 @@ discord command .feedback [<integer>]:
 			make embed:
 				set color of embed to white
 				set the author info of the embed to author named "Thanks for rating the Planet Code bot!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_vote} to the last made embed
 				reply with {_vote}
@@ -159,7 +280,7 @@ discord command .feedback [<integer>]:
 				set the author info of the embed to author named "New rate has came through!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 				set description of the embed to "User: %event-member% %nl% User ID: %id of event-member%"
 				set title of the embed to "User has given feedback with number: ``%arg-1%``"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				send {_embed} to user with id "257875009270317056" with event-bot and store the message in {_feedback}
@@ -170,7 +291,7 @@ discord command .feedback [<integer>]:
 				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 				set the description of embed to "It seems that you can't access this, or it doesn't exist."
 				set {_error} to the last made embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				reply with {_error}
 
@@ -248,7 +369,7 @@ discord command .suggest [<text>]:
 			make embed:
 				set color of embed to white
 				set the author info of the embed to author named "You need to add an argument in order to suggest something!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -259,7 +380,7 @@ discord command .suggest [<text>]:
 				set the author info of the embed to author named "New suggestion!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 				add field named "Suggestion" with value "```%arg-1%```" to embed
 				add field named "User Information:" with value "User's Name: %event-member% %nl% User's Discrim: %discriminator of event-member% %nl% User's ID: %id of event-member%" to embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_suggestion} to the last made embed
 				send {_suggestion} to channel with id "551231048059584514" with event-bot and store the message in {_suggestionemoji}
@@ -274,7 +395,7 @@ discord command .a t [<text>] d [<text>]:
 				add field named ":small_red_triangle_down: Title :small_red_triangle_down:" with value "```%arg-1%```" to embed
 				add field named "Announcement" with value "```%arg-2%```" to embed
 				set {_embed} to the last made embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				send {_embed} to channel with id "551227963782463490" with event-bot
 		else:
@@ -283,7 +404,7 @@ discord command .a t [<text>] d [<text>]:
 				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 				set the description of embed to "It seems that you can't access this, or it doesn't exist."
 				set {_error} to the last made embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				reply with {_error}
 
@@ -293,7 +414,7 @@ discord command .bug [<text>]:
 			make embed:
 				set color of the embed to white
 				set title of the embed to "You need to add a brief description of the bug!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -302,21 +423,51 @@ discord command .bug [<text>]:
 			make embed:
 				set color of the embed to white
 				set title of the embed to "Successfully sent the bug report!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed1} to the last made embed
-				reply with {_embed1} and store the message in {_embed1emoji}
-				add reactions "white_check_mark" to reactions of {_embed1emoji}
 			make embed:
 				set color of the embed to white
 				set title of the embed to "New bug report from %name of event-member%!"
 				set description of the embed to "Name of user: %event-member% %nl% User's discrim: %the discriminator of event-member% %nl% ID of user: %id of event-member%"
 				add field named "Bug Description:" with value "%arg-1%" to embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed2} to the last made embed
-				send {_embed2} to channel with id "561636162079555595" with event-bot and store the message in {embed2emoji}
-				add reactions "x" to reactions of {embed2emoji}
+				send {_embed2} to channel with id "561636162079555595" with event-bot and store the message in {bugemoji}
+				add reactions "white_check_mark" to reactions of {bugemoji}
+
+discord command .todo [<text>]:
+	trigger:
+		if event-member has role named "Founder":
+			if arg-1 is not set:
+				make embed:
+					set color of the embed to white
+					set title of the embed to "You can't add nothing to the to-do list!"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed} to the last made embed
+					reply with {_embed}
+			else:
+				reply with "Successfully added %arg-1% to your to-do list Mr. Drub!"
+				make embed:
+					set color of the embed to white
+					set title of the embed to "New task added to the to-do list!"
+					add field named "Description:" with value "```%arg-1%```" to embed
+					add field named "General Information" with value "Name of user: %event-member% %nl% User's discrim: %the discriminator of event-member% %nl% ID of user: %id of event-member%" to embed
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the timestamp of embed to now
+					set {_embed2} to the last made embed
+					send {_embed2} to channel with id "564953036598804487" with event-bot
+		else:
+			make embed:
+				set color of embed to white
+				set the author info of the embed to author named "Oopsie! We ran into an error!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+				set the description of embed to "It seems that you can't access this, or it doesn't exist."
+				set {_embed} to the last made embed
+				set the footer of embed to footer with text "Planet Code by Drub"
+				set the timestamp of embed to now
+				reply with {_embed}
 
 discord command .staff [<text>]:
 	trigger:
@@ -329,7 +480,7 @@ discord command .staff [<text>]:
 			make embed:
 				set color of embed to white
 				set title of the embed to "Wait, so you need help but don't know why you need help? Hmm.. nope! %nl% *Pro tip: try using ``.staff I lost a role!`` instead!*"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -338,7 +489,7 @@ discord command .staff [<text>]:
 				set color of embed to white
 				set title of the embed to "Someone needs YOUR help!"
 				set description of the embed to "**Reason:** ```%arg-1%```%nl%**Member:** %event-member% %nl%**User ID:** %id of event-member% %nl%**Mention Tag:** %mention tag of event-member%"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_needhelp} to the last made embed
 				send "@here" to channel with id "561506865595285505" with event-bot
@@ -347,7 +498,7 @@ discord command .staff [<text>]:
 			make embed:
 				set color of embed to white
 				set title of the embed to "Successfully notified staff that you were in need of help!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -384,20 +535,19 @@ discord command .answer [<text>]:
 	trigger:
 		delete event-message
 		if arg-1 is not set:
-			make embed:
-				set color of embed to white
-				set title of the embed to "You can't answer nothing!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
-				set the timestamp of embed to now
-				set {_embed} to the last made embed
-				reply with {_embed}
+			if {competition::state} = true:
+				reply with "Yup, there's a competition going on right now. Submit your answer using ``.answer [answer]``. %nl% You can see the question in __##competitions__."
+				stop
+			else if {competition::state} = false:
+				reply with "There's currently no competition going on."
+				stop
 		else:
 			if {competition::state} is true:
 				make embed:
 					set color of embed to white
 					set the author info of the embed to author named "New answer from %name of event-member%!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 					add field named "" with value "%arg-1%" to embed
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					set {_embed} to the last made embed
 					send {_embed} to event-member with event-bot
@@ -406,7 +556,7 @@ discord command .answer [<text>]:
 				make embed:
 					set color of embed to white
 					set title of the embed to "There's no competition going on at the moment."
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					set {_embed} to the last made embed
 					reply with {_embed}
@@ -416,11 +566,18 @@ discord command .competition [<text>]:
 		delete event-message
 		if event-member has role named "Competition Manager":
 			if arg-1 is "start":
-				set {competition::state} to true
-				reply with "Successfully enabled the answers feature!"
+				if {competition::state} = true:
+					reply with "You can't start a new competition! There's 1 going on right now."
+					stop
+				else:
+					set {competition::state} to true
+					reply with "Successfully enabled the answers feature!"
 			else if arg-1 is "end":
-				set {competition::state} to false
-				reply with "Successfully disabled the answers feature!"
+				if {competition::state} = false:
+					reply with "You can't end a non-existent competition!"
+				else:
+					set {competition::state} to false
+					reply with "Successfully disabled the answers feature!"
 			else:
 				reply with "You need to add ``start`` to start a competition, or ``end`` to end a competition."
 		else:
@@ -454,7 +611,7 @@ discord command .faq:
 			add field named ":five: How long has this server been around?" with value "Planet: Code has been around since the 1st of March!" to embed
 			add field named ":six: Who made that dank bot called 'Planet Code'?" with value "Drub did, he owns me. And I'm also a private bot %nl% which means you can't use me for your server." to embed
 			set {_embed} to the last made embed
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			reply with {_embed}
 
@@ -469,7 +626,7 @@ discord command .help [<text>]:
 					add field named "General Help :dizzy:" with value "``.help general``" to embed
 					add field named "Moderation Help :desktop:" with value "``.help moderation``" to embed
 					set {_embed} to the last made embed
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					reply with {_embed}
 			else:
@@ -480,7 +637,7 @@ discord command .help [<text>]:
 					add field named ":dizzy: General Help" with value "``.help general``" to embed
 					add field named ":lock: Moderation Help" to embed
 					set {_embed} to the last made embed
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					reply with {_embed}
 		else if arg-1 is "economy":
@@ -496,9 +653,8 @@ discord command .help [<text>]:
 				add field named ":tada: Drop Party" with value "And the final method is by participating at drop parties. %nl% These are most of the time announced by the owner and last for 15 seconds. ``.dropparty claim``" to embed
 				add field named ":shopping_cart: Shop" with value "The shop can be used for buying special perks, and upgrade stuff. While this is still being worked on you won't have access to the shop. ``.shop``" to embed
 				add field named ":game_die: Gambling" with value "Gambling could get you super rich in no-time or make you the brokest member in this discord. %nl% We have different gamble categories. %nl%- Starting at 'a' you have a 45%% chance of winning which will double your amount. %nl%- Going to 'b' you have a 25%% chance of winning which will triple your amount. %nl%- Ending at 'c' you have a 15%% of winning which will quadruple your amount. ``.gamble [a/b/c] [amount]``" to embed
-				add field named ":money_with_wings: Pay" with value "Paying members can be useful sometimes. %nl% To pay someone points you can use ``.pay [member] [amount]``." to embed
 				set {_embed} to the last made embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				reply with {_embed}
 		else if arg-1 is "general":
@@ -513,7 +669,6 @@ discord command .help [<text>]:
 				add field named ":question: Frag" with value "What is 'fragging'? ``.frag``" to embed
 				add field named ":incoming_envelope: Messages" with value "See how many messages you've sent in general! ``.messages [<user>]``" to embed
 				add field named ":credit_card: Bank" with value "See how many points you have or someone else has! ``.bank [<user>]``" to embed
-				add field named ":money_with_wings: Pay" with value "Paying members can be useful sometimes. %nl% To pay someone points you can use ``.pay [member] [amount]``." to embed
 				add field named ":grey_question: Faq" with value "We understand that not every member knows everything. %nl% Therefore we have a Frequently Asked Questions feature. ``.faq``" to embed
 				add field named ":pencil: Answer" with value "Every now and then the competition managers organize a competition. %nl% To avoid cheating we allow you to send answers to the competition managers directly. ``.answer [text]``" to embed
 				add field named ":triangular_flag_on_post: Need Help!" with value "Are you in need of help? Alright, uhh. Let's think of something.. %nl% Oh wait! Simply notify all staff online for help with ``.staff [reason]``" to embed
@@ -523,8 +678,9 @@ discord command .help [<text>]:
 				add field named ":8ball: 8ball" with value "Do you want to 8ball a question? %nl% Check it out with ``.8ball [question]``" to embed
 				add field named ":love_letter: Rate the bot!" with value "If you have 10 seconds of your whole life, then please rate the bot! %nl% To start, just execute ``.feedback [number from 1-10]``. Thanks!" to embed
 				add field named ":straight_ruler: How long is it?" with value "See how long someone's penis is! ``.penis [member]``" to embed
+				add field named ":microscope: How many?" with value "Check how many messages there have been sent in this server! %nl% Start date was: 04/10/2019 | 4PM GMT +1 | ``.totalmessages``" to embed
 				set {_embed} to the last made embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				reply with {_embed}
 		else if arg-1 is "Moderation":
@@ -534,7 +690,7 @@ discord command .help [<text>]:
 					set title of the embed to "Moderation Help"
 					add split field named "Moderation Commands:" with value "**Purge** %nl% ``.purge [integer]`` %nl% **More coming soon..**" to embed
 					set {_embed} to the last made embed
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					reply with {_embed}
 			else:
@@ -542,14 +698,14 @@ discord command .help [<text>]:
 					set color of embed to white
 					set title of the embed to "Nope, no access to this help panel! Sorry."
 					set {_embed} to the last made embed
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					reply with {_embed}
 		else:
 			make embed:
 				set color of embed to white
 				set title of the embed to "There's no help panel with the name ``%arg-1%``!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -560,13 +716,13 @@ discord command .shop:
 			set color of embed to white
 			set the author info of the embed to author named "Welcome to my shop.." with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 			set title of the embed to "Here's some information for you to know:"
-			set the description of embed to "When you're looking to buy stuff, simply do: ``.buy <item>`` %nl% PPM = Points Per Message"
-			add split field named "Special Perks" with value ":white_small_square: **+1 PPM** (15.000 points)%nl%:white_small_square: **+2 PPM** (30.000 points)" to embed
+			set the description of embed to "When you're looking to buy stuff, simply do: ``.buy <item>`` %nl% PPM = Points Per Message %nl% Request a role: ``.role name [role name] color [role color]``"
+			add split field named "Special Perks" with value ":white_small_square: **+1 PPM** (15.000 points)%nl%:white_small_square: **+2 PPM** (30.000 points)%nl%:white_small_square: **Personal Role** (50.000 points)" to embed
 			add split field named "Roles" with value ":white_small_square: **Starter** (5000 points)%nl%:white_small_square: **Veteran** (10.000 points)%nl%:white_small_square: **Special** (15.000 points)%nl%:white_small_square: **Well-Known** (20.000 points)%nl%:white_small_square: **Elder** (30.000 points)" to embed
-			add split field named "Coming Soon.." with value "Coming Soon.." to embed
+			add split field named "Fun Commands" with value ":white_small_square: Mark the bot (500 each time) %nl%*Using this fun command will allow you to mark the bot as watching/playing/listening to whatever text you'd like!* %nl%*This costs 500 points each time and the mark lasts for 2 minutes. ``.setmark Type [watching/playing/listening] Text [text]``*%nl%:white_small_square: Coming Soon.." to embed
 			set the thumbnail of embed to "https://cdn.discordapp.com/attachments/557321332627603478/561233298215534600/Shop-icon.png"
 			set {_embed} to the last made embed
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			reply with {_embed}
 
@@ -587,6 +743,7 @@ discord command .buy [<text>]:
 					reply with "You already have that feature unlocked!"
 				else:
 					add role with id "561238525136076823" to roles of event-member
+					subtract 15000 from {points::%event-member%}
 					make embed:
 						set color of embed to white
 						set the author info of the embed to author named "Successful purchase!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
@@ -605,6 +762,7 @@ discord command .buy [<text>]:
 					reply with "You first need to unlock the ``+1 PPM`` feature first!"
 				else:
 					add role with id "561238648650072083" to roles of event-member
+					subtract 30000 from {points::%event-member%}
 					make embed:
 						set color of embed to white
 						set the author info of the embed to author named "Successful purchase!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
@@ -712,6 +870,21 @@ discord command .buy [<text>]:
 					reply with "You first need to unlock the ``Well-Known`` role before purchasing this!"
 			else:
 				reply with "You don't have enough points to purchase this!"
+		else if arg-1 is "Personal Role":
+			if {points::%event-member%} >= 50000:
+				set {role::%event-member%} to true
+				make embed:
+					set color of embed to white
+					set the author info of the embed to author named "Successful purchase!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
+					set the description of embed to "Successfully purchased the ``Personal Role`` perk!"
+					set {_embed} to the last made embed
+					set the footer of embed to footer with text "Planet Code by Drub"
+					set the timestamp of embed to now
+					reply with {_embed}
+					subtract 50000 from {points::%event-member%}
+
+			else:
+				reply with "You don't have enough points to purchase this!"
 		else:
 			make embed:
 				set color of embed to white
@@ -750,7 +923,7 @@ discord command .info [<member>]:
 					add field named "Vault" with value "0" to embed
 				else:
 					add field named "Vault" with value "%{vault::%event-member%}%" to embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -780,7 +953,7 @@ discord command .info [<member>]:
 					add field named "Vault" with value "0" to embed
 				else:
 					add field named "Vault" with value "%{vault::%event-member%}%" to embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -827,7 +1000,7 @@ discord command .frag:
 		make embed:
 			set color of embed to cyan
 			set title of the embed to "Fragmenting is intentionally shortening your messages so you can increase your count."
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			set {_embed} to the last made embed
 			set footer of {_embed} to a footer with text ""
@@ -887,7 +1060,7 @@ discord command .work:
 			make embed:
 				set color of embed to white
 				set title of the embed to "You have worked for ``%{_work}%`` points."
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -905,7 +1078,7 @@ discord command .daily:
 			make embed:
 				set color of embed to white
 				set title of the embed to "You picked up %{_daily}% points from your daily package!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -921,7 +1094,7 @@ discord command .ddos:
 			make embed:
 				set color of embed to white
 				set title of the embed to "You're not allowed to do this right now.%nl%You're still on a cooldown from previous attack.%nl%Come back in %difference between 3 days and {_ddos}%!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_nope} to the last made embed
 			reply with {_nope}
@@ -932,7 +1105,7 @@ discord command .ddos:
 				set color of embed to white
 				set title of the embed to "Okay chief, I got it!"
 				add field named "Sending packages.." with value "I'll let you know how the attack went in about 30 seconds." to embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_yes} to the last made embed
 				reply with {_yes}
@@ -943,7 +1116,7 @@ discord command .ddos:
 					set color of embed to white
 					set title of the embed to "We got 'em!"
 					add field named "Your attack was successful!" with value "Wow! You were able to steal %{_ddospoints}% points!" to embed
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					set {_successful} to the last made embed
 					reply with {_successful}
@@ -954,27 +1127,11 @@ discord command .ddos:
 					set color of embed to white
 					set title of the embed to "I'm sorry chief."
 					add field named "Chief, I'm coming back with bad news." with value "Our attack wasn't successful. They stole %{_welost}% points from us." to embed
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					set {_dammit} to the last made embed
 					reply with {_dammit}
 				subtract {_welost} from {points::%event-member%}
-
-
-discord command .pay [<member>] [<integer>]:
-	trigger:
-		if arg-1 is not set:
-			reply with "You need to specify a member!"
-		else if arg-2 is not set:
-			reply with "You need to specify an amount to pay!"
-		else if {points::%event-member%} < arg-2:
-			reply with "You don't have that many points!"
-		else if arg-2 < 0:
-			reply with "You can't pay negative points!"
-		else:
-			subtract arg-2 from {points::%event-member%}
-			add arg-2 to {points::%arg-1%}
-			reply with "Successfully paid ``%arg-2%`` points to %name of arg-1%"
 
 discord command .points:
 	aliases: p
@@ -1015,6 +1172,8 @@ discord command .rob [<member>]:
 		if {_rob} is less than 6 hours:
 			reply with "You can't rob someone right now! %nl% Come back in %difference between 6 hours and {_rob}%"
 			stop
+		else if arg-1 = event-member:
+			reply with "You can't rob yourself, lol."
 		else if arg-1 is not set:
 			reply with "You need to specify a member to rob!"
 			stop
@@ -1064,7 +1223,7 @@ discord command .bank [<member>]:
 				else:
 					add split field named "Vault" with value "%{vault::%event-member%}% points" to embed
 				set {_embed} to the last made embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				reply with {_embed}
 		else:
@@ -1083,7 +1242,7 @@ discord command .bank [<member>]:
 				else:
 					add split field named "Vault" with value "%{vault::%arg-1%}% points" to embed
 				set {_embed} to the last made embed
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				reply with {_embed}
 
@@ -1104,16 +1263,22 @@ discord command .gamble [<text>] [<integer>]:
 		else if arg-2 <= 0:
 			reply with "You can't gamble a negative amount or gamble 0 points!"
 		else if {points::%event-member%} >= arg-2:
-			if arg-1 is "a":
+			set {_gamble} to difference between {gamble.%event-member%.lastused} and now
+			if {_gamble} is less than 5 seconds:
+				reply with "You have to wait **%difference between 5 seconds and {_gamble}%** before you can gamble again!"
+				stop
+			else if arg-1 is "a":
 				chance of 45%:
 					subtract arg-2 from {points::%event-member%}
 					add arg-2 to {points::%event-member%}
 					add arg-2 to {points::%event-member%}
 					reply with "You won! You now have %{points::%event-member%}% points."
+					set {gamble.%event-member%.lastused} to now
 					stop
 				else:
 					subtract arg-2 from {points::%event-member%}
 					reply with "You lost. You now have %{points::%event-member%}% points."
+					set {gamble.%event-member%.lastused} to now
 					stop
 			else if arg-1 is "b":
 				chance of 25%:
@@ -1121,10 +1286,13 @@ discord command .gamble [<text>] [<integer>]:
 					add arg-2 to {points::%event-member%}
 					add arg-2 to {points::%event-member%}
 					add arg-2 to {points::%event-member%}
+					reply with "You won! You now have %{points::%event-member%}% points."
+					set {gamble.%event-member%.lastused} to now
 					stop
 				else:
 					subtract arg-2 from {points::%event-member%}
 					reply with "You lost. You now have %{points::%event-member%}% points."
+					set {gamble.%event-member%.lastused} to now
 					stop
 			else if arg-1 is "c":
 				chance of 15%:
@@ -1133,10 +1301,13 @@ discord command .gamble [<text>] [<integer>]:
 					add arg-2 to {points::%event-member%}
 					add arg-2 to {points::%event-member%}
 					add arg-2 to {points::%event-member%}
+					reply with "You won! You now have %{points::%event-member%}% points."
+					set {gamble.%event-member%.lastused} to now
 					stop
 				else:
 					subtract arg-2 from {points::%event-member%}
 					reply with "You lost. You now have %{points::%event-member%}% points."
+					set {gamble.%event-member%.lastused} to now
 					stop
 			else:
 				reply with "I don't recognize that one."
@@ -1150,21 +1321,20 @@ discord command .purge [<number>]:
 			make embed:
 				set color of embed to white
 				set title of the embed to "You need to specify a number that I can purge!"
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to last made embed
 				reply with {_embed}
 		else:
 			if event-member has role named "Moderator":
-				send typing in event-channel
-				grab the last arg-1 messages in event-channel
-				purge the grabbed messages with event-bot
 				make embed:
 					set color of embed to white
 					set title of the embed to "I have successfully purged %arg-1% messages."
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					set {_embed} to last made embed
+					grab the last arg-1 messages in event-channel
+					purge the grabbed messages with event-bot
 					reply with {_embed} and store the message in {_answer}
 					wait 2 seconds
 					delete random message out of {_answer} with event-bot
@@ -1187,7 +1357,7 @@ discord command .messages [<member>]:
 				make embed:
 					set color of embed to white
 					set title of the embed to "You have sent 0 messages."
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					set {_embed} to the last made embed
 					reply with {_embed}
@@ -1195,7 +1365,7 @@ discord command .messages [<member>]:
 				make embed:
 					set color of embed to white
 					set title of the embed to "You have sent %{messages::%event-member%}% messages."
-					set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+					set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 					set the timestamp of embed to now
 					set {_embed} to the last made embed
 					reply with {_embed}
@@ -1203,7 +1373,7 @@ discord command .messages [<member>]:
 			make embed:
 				set color of embed to white
 				set title of the embed to "%arg-1% has sent 0 messages."
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
@@ -1211,67 +1381,69 @@ discord command .messages [<member>]:
 			make embed:
 				set color of the embed to white
 				set title of the embed to "%arg-1% has sent %{messages::%arg-1%}% messages."
-				set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+				set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 				set the timestamp of embed to now
 				set {_embed} to the last made embed
 				reply with {_embed}
 
 on guild message received seen by "Planet Code":
-	if event-channel is channel with id "560571089802231812" or "553151511069458433" or "561672138294165694":
-		add 1 to {messages::%event-member%}
-	else:
-		add 1 to {messages::%event-member%}
+	add 1 to {messages::%event-member%}
+	add 1 to {totalmessages.humans}
+	if event-member has role named "Developer":
 		chance of 50%:
 			add 1 to {points::%event-member%}
-			stop
-		else:
-			stop
-	if {messages::%event-member%} = 100:
+		else if event-member has role named "+1 PPM":
+			chance of 50%:
+				add 2 to {points::%event-member%}
+		else if event-member has role named "+2 PPM":
+			chance of 50%:
+				add 3 to {points::%event-member%}
+	else if {messages::%event-member%} = 100:
 		reply with "%mention tag of event-member%"
 		make embed:
 			set color of embed to white
 			set title of the embed to "%name of event-member% has just sent __100__ messages! %nl% And has been awarded with ``100`` points for that!"
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			set {_embed} to the last made embed
 			reply with {_embed}
 		add 100 to {points::%event-member%}
-	if {messages::%event-member%} = 200:
+	else if {messages::%event-member%} = 200:
 		reply with "%mention tag of event-member%"
 		make embed:
 			set color of embed to white
 			set title of the embed to "%name of event-member% has just sent __200__ messages! %nl% And has been awarded with ``200`` points for that!"
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			set {_embed} to the last made embed
 			reply with {_embed}
 		add 200 to {points::%event-member%}
-	if {messages::%event-member%} = 300:
+	else if {messages::%event-member%} = 300:
 		reply with "%mention tag of event-member%"
 		make embed:
 			set color of embed to white
 			set title of the embed to "%name of event-member% has just sent __300__ messages! %nl% And has been awarded with ``300`` points for that!"
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			set {_embed} to the last made embed
 			reply with {_embed}
 		add 300 to {points::%event-member%}
-	if {messages::%event-member%} = 400:
+	else if {messages::%event-member%} = 400:
 		reply with "%mention tag of event-member%"
 		make embed:
 			set color of embed to white
 			set title of the embed to "%name of event-member% has just sent __400__ messages! %nl% And has been awarded with ``400`` points for that!"
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			set {_embed} to the last made embed
 			reply with {_embed}
 		add 400 to {points::%event-member%}
-	if {messages::%event-member%} = 500:
+	else if {messages::%event-member%} = 500:
 		reply with "%mention tag of event-member%"
 		make embed:
 			set color of embed to white
 			set title of the embed to "%name of event-member% has just sent __500__ messages! %nl% And has been awarded with ``500`` points for that!"
-			set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+			set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 			set the timestamp of embed to now
 			set {_embed} to the last made embed
 			reply with {_embed}
@@ -1283,7 +1455,7 @@ on member join guild:
 		set color of embed to white
 		set title of the embed to "%event-member% joined the server."
 		set the author info of the embed to author named "Welcome to Planet: Code!" with no url and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
-		set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+		set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 		set the timestamp of embed to now
 		set {_embed} to the last made embed
 		send {_embed} to channel with id "551225024393117708" with event-bot
@@ -1291,11 +1463,11 @@ on member join guild:
 		set color of embed to white
 		set the author info of the embed to author named "Some information:" with url "https://discordapp.com/channels/551225024393117706/551227990155984905/555426109466869781" and icon "https://cdn.discordapp.com/attachments/551227990155984905/555426102059859989/PlanetCode-pfp.png"
 		set description of the embed to "Hey, welcome to our server %event-member%! %nl%To start things off with I'd recommend going to the ##information and the ##roles channel! %nl%And if you feel like exploring today you're able to execute ``.help`` in ##bot-spam! %nl%*Enjoy your stay! %nl%~ Planet: Code Staff Team*"
-		set the footer of embed to footer with text "Planet Code by Drub" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
+		set the footer of embed to footer with text "Executor: %event-member%" and icon "https://cdn.discordapp.com/avatars/257875009270317056/7480d9cc1f4928c09391f6ef69241431.png"
 		set the timestamp of embed to now
 		set {_welcome} to the last made embed
 		send {_welcome} to event-member with event-bot
-
+		send "Hey, welcome %mention tag of event-member%!%nl%To get started with things, you can go to __##information__ then to __##roles__ and if you feel like exploring today then you can explore me with executing ``.help`` in __##bot-spam__ :smile:" to channel with id "551225024393117708" with event-bot
 
 on direct message received:
 	reply with "Use these commands in __##bot-spam__ for further assistance!"
@@ -1312,11 +1484,15 @@ on direct message received:
 	reply with "Discord Server: https://discord.gg/hD2GsUs"
 
 on reaction added seen by "Planet Code":
-	if event-message is {embed2emoji}:
+	if event-message is {bugemoji}:
 		if bot state of event-member is false:
-			if name of event-emote is "x":
-				delete event-message
+			if name of event-emote is "white_check_mark":
+				grab the last 1 messages in event-channel
+				purge the grabbed messages with event-bot
+				stop
 	else if event-message is {needhelpemoji}:
 		if bot state of event-member is false:
 			if name of event-emote is "white_check_mark":
-				delete event-message
+				grab the last 2 messages in event-channel
+				purge the grabbed messages with event-bot
+				stop
